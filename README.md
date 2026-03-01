@@ -1,8 +1,35 @@
 # QuantEdge — Quantitative Trading Platform
 
-<img width="1076" alt="image" src="https://github.com/punyamodi/Trading_Bot/assets/68418104/5671134e-2ac8-42ce-9d6c-0408ce20590e">
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab?style=flat-square&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-ff4b4b?style=flat-square&logo=streamlit&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109%2B-009688?style=flat-square&logo=fastapi&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.1%2B-ee4c2c?style=flat-square&logo=pytorch&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-a6e3a1?style=flat-square)
+
+</div>
+
+<img width="1076" alt="QuantEdge Dashboard" src="https://github.com/punyamodi/Trading_Bot/assets/68418104/5671134e-2ac8-42ce-9d6c-0408ce20590e">
 
 A professional-grade quantitative trading system combining FinBERT sentiment analysis, technical indicators, and algorithmic strategies for systematic market participation. Features a full Streamlit dashboard, FastAPI REST backend, comprehensive backtesting engine, and live trading via Alpaca Markets.
+
+---
+
+## Platform Preview
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                       QuantEdge  |  Dashboard                        │
+├──────────────┬──────────────┬───────────────┬────────────────────────┤
+│  Dashboard   │Market Analysis│  Backtesting  │  Portfolio & Trading   │
+│              │               │               │                        │
+│  SPY  +0.4%  │  Candlestick  │  Equity Curve │  AAPL  10 shares       │
+│  QQQ  +0.6%  │  + BB / SMA   │  Drawdown     │  TSLA   5 shares       │
+│  AAPL  quote │  RSI  |  MACD │  Trade Log    │  Place Order           │
+│  Sector Map  │  Sentiment    │  Metrics Grid │  Auto Strategy         │
+└──────────────┴───────────────┴───────────────┴────────────────────────┘
+```
 
 ---
 
@@ -13,7 +40,7 @@ A professional-grade quantitative trading system combining FinBERT sentiment ana
 - 12+ technical indicators: RSI, MACD, Bollinger Bands, Stochastics, ATR, OBV, Williams %R, CCI, VWAP
 - Moving averages: SMA 20/50/200, EMA 9/21
 - Automated signal detection with bullish/bearish classification
-- Sector performance heatmap
+- Sector performance heatmap and market movers
 
 **ML Sentiment Analysis**
 - FinBERT (ProsusAI/finbert) for financial news NLP
@@ -24,7 +51,7 @@ A professional-grade quantitative trading system combining FinBERT sentiment ana
 **Backtesting Engine**
 - Three built-in strategies: Momentum, Mean Reversion, ML Sentiment
 - Configurable parameters: RSI thresholds, Bollinger Band width, sentiment threshold
-- Performance metrics: Sharpe ratio, Sortino ratio, Calmar ratio, max drawdown, win rate, profit factor, trade expectancy
+- Performance metrics: Sharpe ratio, Sortino ratio, Calmar ratio, max drawdown, win rate, profit factor
 - Interactive equity curve and drawdown charts
 - Full trade log with entry/exit details
 
@@ -52,37 +79,83 @@ A professional-grade quantitative trading system combining FinBERT sentiment ana
 
 ## Architecture
 
+```mermaid
+graph TB
+    subgraph UI["Streamlit UI (app.py + pages/)"]
+        D[Dashboard]
+        MA[Market Analysis]
+        BT[Backtesting]
+        PF[Portfolio]
+        LT[Live Trading]
+    end
+
+    subgraph API["FastAPI Backend (api/)"]
+        MR[/market routes/]
+        BR[/backtest routes/]
+        TR[/trading routes/]
+        PR[/portfolio routes/]
+    end
+
+    subgraph SVC["Services Layer"]
+        MD[market_data.py]
+        IND[indicators.py]
+        SENT[sentiment.py]
+        BACK[backtesting.py]
+        RISK[risk.py]
+        PORT[portfolio.py]
+    end
+
+    subgraph EXT["External"]
+        YF[yfinance]
+        ALP[Alpaca API]
+        FB[FinBERT Model]
+        DB[(SQLite DB)]
+    end
+
+    UI --> SVC
+    API --> SVC
+    MD --> YF
+    PORT --> ALP
+    SENT --> FB
+    BACK --> DB
+```
+
+---
+
+## Project Structure
+
 ```
 quantedge/
-├── app.py                  # Streamlit main entry point
+├── app.py                   # Streamlit main entry point
+├── run.py                   # Launch UI, API, or both
 ├── pages/
-│   ├── 1_Dashboard.py      # Market overview and watchlist
+│   ├── 1_Dashboard.py       # Market overview and watchlist
 │   ├── 2_Market_Analysis.py # Charts and technical analysis
-│   ├── 3_Backtesting.py    # Strategy backtesting
-│   ├── 4_Portfolio.py      # Portfolio and positions
-│   ├── 5_Live_Trading.py   # Order placement and automation
-│   └── 6_Settings.py       # API credentials and defaults
+│   ├── 3_Backtesting.py     # Strategy backtesting
+│   ├── 4_Portfolio.py       # Portfolio and positions
+│   ├── 5_Live_Trading.py    # Order placement and automation
+│   └── 6_Settings.py        # API credentials and defaults
 ├── api/
-│   ├── main.py             # FastAPI application
-│   └── routes/             # market, portfolio, backtest, trading
+│   ├── main.py              # FastAPI application
+│   └── routes/              # market, portfolio, backtest, trading
 ├── core/
-│   ├── config.py           # Pydantic settings
-│   └── database.py         # SQLAlchemy engine
+│   ├── config.py            # Pydantic settings
+│   └── database.py          # SQLAlchemy engine
 ├── models/
-│   ├── orm.py              # Database models
-│   └── schemas.py          # Pydantic schemas
+│   ├── orm.py               # Database models
+│   └── schemas.py           # Pydantic schemas
 ├── services/
-│   ├── market_data.py      # yfinance data fetching
-│   ├── sentiment.py        # FinBERT inference
-│   ├── indicators.py       # Technical analysis
-│   ├── backtesting.py      # Backtesting engine
-│   ├── risk.py             # Risk metrics
-│   └── portfolio.py        # Alpaca broker integration
+│   ├── market_data.py       # yfinance data fetching
+│   ├── sentiment.py         # FinBERT inference
+│   ├── indicators.py        # Technical analysis
+│   ├── backtesting.py       # Backtesting engine
+│   ├── risk.py              # Risk metrics
+│   └── portfolio.py         # Alpaca broker integration
 ├── strategies/
-│   ├── base.py             # Abstract base strategy
-│   ├── momentum.py         # RSI + MACD momentum
-│   ├── mean_reversion.py   # Bollinger Band reversion
-│   └── ml_sentiment.py     # FinBERT sentiment strategy
+│   ├── base.py              # Abstract base strategy
+│   ├── momentum.py          # RSI + MACD momentum
+│   ├── mean_reversion.py    # Bollinger Band reversion
+│   └── ml_sentiment.py      # FinBERT sentiment strategy
 └── tests/
     ├── test_indicators.py
     └── test_risk.py
@@ -102,7 +175,7 @@ pip install -r requirements.txt
 
 **Environment Setup**
 
-Copy `.env.example` to `.env` and add your credentials:
+Copy `.env.example` to `.env` and fill in your credentials:
 
 ```bash
 cp .env.example .env
@@ -120,7 +193,7 @@ Get free paper trading API keys at [alpaca.markets](https://alpaca.markets).
 
 ## Usage
 
-**Launch the UI (Streamlit dashboard)**
+**Launch the Streamlit dashboard**
 
 ```bash
 streamlit run app.py
@@ -128,15 +201,15 @@ streamlit run app.py
 
 Opens at `http://localhost:8501`
 
-**Launch the REST API**
+**Launch the FastAPI REST backend**
 
 ```bash
 python run.py api
 ```
 
-API runs at `http://localhost:8000` with interactive docs at `/docs`
+API runs at `http://localhost:8000` — interactive docs at `/docs`
 
-**Launch both**
+**Launch both together**
 
 ```bash
 python run.py both
@@ -154,9 +227,9 @@ pytest tests/ -v
 
 | Strategy | Signal Sources | Key Parameters |
 |---|---|---|
-| Momentum | RSI + MACD crossover | RSI oversold/overbought, volume confirmation |
-| Mean Reversion | Bollinger Bands | Band width, RSI filter, take profit at mid-band |
-| ML Sentiment | FinBERT news NLP | Confidence threshold, technical confirmation |
+| Momentum | RSI + MACD crossover | RSI oversold/overbought thresholds, volume filter |
+| Mean Reversion | Bollinger Bands | Band width multiplier, RSI confirmation, mid-band exit |
+| ML Sentiment | FinBERT news NLP | Confidence threshold, technical confirmation required |
 
 ---
 
@@ -166,34 +239,77 @@ pytest tests/ -v
 |---|---|
 | Sharpe Ratio | Risk-adjusted return vs risk-free rate |
 | Sortino Ratio | Sharpe using only downside volatility |
-| Calmar Ratio | Annual return divided by max drawdown |
-| Max Drawdown | Largest peak-to-trough decline |
-| Win Rate | Percentage of profitable trades |
+| Calmar Ratio | Annualized return divided by max drawdown |
+| Max Drawdown | Largest peak-to-trough equity decline |
+| Win Rate | Percentage of profitable closed trades |
 | Profit Factor | Gross profit divided by gross loss |
 | VaR (95%) | Value at Risk at 95% confidence |
 | CVaR | Conditional VaR (expected shortfall) |
+| Beta | Correlation of returns vs benchmark |
+| Alpha | Excess return above benchmark |
 
 ---
 
 ## Backtesting Example
 
+```
+Strategy: Mean Reversion  |  Symbol: SPY  |  2021-01-01 to 2023-12-31
+──────────────────────────────────────────
+ Initial Capital :  $100,000.00
+ Final Equity    :  $114,823.50
+ Total Return    :    +14.82%
+ Sharpe Ratio    :      1.23
+ Sortino Ratio   :      1.87
+ Max Drawdown    :     -8.4%
+ Win Rate        :     64.3%
+ Profit Factor   :      2.1
+ Total Trades    :       28
+──────────────────────────────────────────
+```
+
+---
+
+## Code Examples
+
+**Run a backtest programmatically**
+
 ```python
-from services.backtesting import run_backtest
+from services.backtesting import BacktestEngine
 
-result = run_backtest(
-    strategy="momentum",
+engine = BacktestEngine(initial_capital=100_000.0)
+result = engine.run_mean_reversion_strategy(
     symbol="SPY",
-    start_date="2021-01-01",
+    start_date="2022-01-01",
     end_date="2023-12-31",
-    initial_capital=100000.0,
-    parameters={
-        "rsi_oversold": 30,
-        "rsi_overbought": 70,
-        "cash_at_risk": 0.5,
-    }
+    bb_window=20,
+    bb_std=2.0,
+    rsi_filter=True,
 )
+print(result)
+```
 
-print(result.to_dict())
+**Run sentiment analysis**
+
+```python
+from services.sentiment import estimate_sentiment
+
+headlines = [
+    "Fed signals rate cuts ahead, markets rally",
+    "Strong earnings beat expectations across tech sector",
+]
+
+probability, sentiment = estimate_sentiment(headlines)
+print(f"{sentiment}  ({probability:.1%})")
+# positive  (94.3%)
+```
+
+**Fetch indicators**
+
+```python
+from services.indicators import TechnicalIndicators
+
+df = TechnicalIndicators.compute_all("AAPL", period="6mo")
+print(df[["close", "rsi", "macd", "bb_upper", "bb_lower"]].tail())
 ```
 
 ---
